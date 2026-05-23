@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+{% block title %}Dengue Detection - AI Dengue System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Symptom Input Form -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header" style="background: linear-gradient(135deg, #ef4444, #b91c1c);">
+                <i class="fas fa-stethoscope"></i> AI Dengue Detection — Symptom Assessment
+            </div>
+            <div class="card-body">
+                <form id="detectionForm">
+                    <!-- Fever Monitoring -->
+                    <h5 class="mb-3"><i class="fas fa-thermometer-full text-danger"></i> Fever Monitoring</h5>
+                    <div class="row mb-2">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">High Fever (≥38.5°C)</label>
+                            <select class="form-select" id="high_fever"><option value="1">Yes</option><option value="0" selected>No</option></select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Fever Duration (days)</label>
+                            <input type="number" class="form-control" id="fever_duration_days" min="0" max="14" value="0">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Biphasic / Saddleback Fever Pattern</label>
+                        <select class="form-select" id="biphasic_fever"><option value="0" selected>No</option><option value="1">Yes — Fever dropped then returned</option></select>
+                        <small class="text-muted">Fever drops temporarily then comes back — characteristic of dengue</small>
+                    </div>
+                    <hr>
+
+                    <!-- Physical Symptoms -->
+                    <h5 class="mb-3"><i class="fas fa-user-injured text-warning"></i> Physical Symptoms</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Severe Muscle/Joint Pain</label>
+                            <select class="form-select" id="muscle_joint_pain"><option value="0" selected>No</option><option value="1">Yes</option></select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Pain Behind Eyes</label>
+                            <select class="form-select" id="pain_behind_eyes"><option value="0" selected>No</option><option value="1">Yes</option></select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Headache</label>
+                            <select class="form-select" id="headache"><option value="0" selected>No</option><option value="1">Yes</option></select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Fatigue</label>
+                            <select class="form-select" id="fatigue"><option value="0" selected>No</option><option value="1">Yes</option></select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Vomiting</label>
+                            <select class="form-select" id="vomiting"><option value="0" selected>No</option><option value="1">Yes</option></select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Skin Rash</label>
+                            <select class="form-select" id="skin_rash"><option value="0" selected>No</option><option value="1">Yes</option></select>
+                        </div>
+                    </div>
+                    <hr>
+
+                    <!-- Warning Signs -->
+                    <h5 class="mb-3"><i class="fas fa-exclamation-triangle text-danger"></i> Warning Signs</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Bleeding (Gums/Nose)</label>
+                            <select class="form-select" id="bleeding_signs"><option value="0" selected>No</option><option value="1">Yes</option></select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Severe Abdominal Pain</label>
+                            <select class="form-select" id="severe_abdominal_pain"><option value="0" selected>No</option><option value="1">Yes</option></select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Rapid Breathing</label>
+                            <select class="form-select" id="rapid_breathing"><option value="0" selected>No</option><option value="1">Yes</option></select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Extreme Fatigue/Restlessness</label>
+                            <select class="form-select" id="extreme_fatigue_restlessness"><option value="0" selected>No</option><option value="1">Yes</option></select>
+                        </div>
+                    </div>
+                    <hr>
+
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-robot"></i> AI Model</label>
+                        <select class="form-select" id="model_type">
+                            <option value="rf">Random Forest (Recommended)</option>
+                            <option value="lr">Logistic Regression</option>
+                            <option value="svm">Support Vector Machine</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-danger w-100"><i class="fas fa-brain"></i> Analyze Symptoms</button>
+                </form>
+
+                <div class="alert alert-warning mt-3">
+                    <strong><i class="fas fa-exclamation-triangle"></i> Important:</strong>
+                    Dengue cannot be definitively diagnosed without medical testing. Symptoms overlap with flu, malaria, and Zika. This AI provides early risk assessment only.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Panel -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header"><i class="fas fa-chart-bar"></i> AI Detection Results</div>
+            <div class="card-body">
+                <div id="loadingSpinner" class="text-center" style="display:none;">
+                    <div class="spinner-border text-danger"><span class="visually-hidden">Loading...</span></div>
+                    <p class="mt-3">AI is analyzing symptoms...</p>
+                </div>
+                <div id="resultsContainer" style="display:none;">
+                    <div class="text-center mb-4">
+                        <h3>Dengue Risk Level</h3>
+                        <div id="riskBadge"></div>
+                        <h5 class="mt-2">Confidence: <span id="confidence"></span></h5>
+                    </div>
+                    <div class="mb-4">
+                        <h5><i class="fas fa-chart-pie"></i> Risk Probabilities</h5>
+                        <div class="mb-2"><div class="d-flex justify-content-between"><span>Low:</span><span id="probLow"></span></div><div class="progress" style="height:22px;"><div id="probLowBar" class="progress-bar bg-success"></div></div></div>
+                        <div class="mb-2"><div class="d-flex justify-content-between"><span>Moderate:</span><span id="probMod"></span></div><div class="progress" style="height:22px;"><div id="probModBar" class="progress-bar bg-warning"></div></div></div>
+                        <div class="mb-2"><div class="d-flex justify-content-between"><span>High:</span><span id="probHigh"></span></div><div class="progress" style="height:22px;"><div id="probHighBar" class="progress-bar bg-danger"></div></div></div>
+                    </div>
+                    <div class="mb-4"><h5><i class="fas fa-lightbulb"></i> AI Symptom Analysis</h5><div id="aiExplanation"></div></div>
+                    <div class="mb-4"><h5><i class="fas fa-notes-medical"></i> Recommendations</h5><ul id="recommendations"></ul></div>
+                    <div class="alert alert-info"><strong><i class="fas fa-robot"></i> Model:</strong> <span id="modelUsed"></span></div>
+                </div>
+                <div id="initialMessage" class="text-center text-muted">
+                    <i class="fas fa-stethoscope fa-3x mb-3"></i>
+                    <p>Enter your symptoms and click "Analyze Symptoms" to see AI risk assessment</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tourniquet Test Education -->
+        <div class="card mt-4">
+            <div class="card-header" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9);"><i class="fas fa-info-circle"></i> Tourniquet Test (Educational)</div>
+            <div class="card-body">
+                <p><strong>What is it?</strong> A clinical test where a blood pressure cuff is inflated on the upper arm for 5 minutes.</p>
+                <p><strong>What to look for:</strong> <em>Petechiae</em> — small red/purple dots under the skin caused by minor bleeding.</p>
+                <p><strong>Positive result:</strong> More than 20 petechiae per square inch may indicate dengue.</p>
+                <div class="alert alert-warning mb-0"><i class="fas fa-exclamation-triangle"></i> This is only a clinical indicator, NOT a definitive diagnosis. Only a trained medical professional should perform and interpret this test.</div>
+            </div>
+        </div>
+
+        <!-- Medication Safety -->
+        <div class="card mt-4">
+            <div class="card-header" style="background: linear-gradient(135deg, #10b981, #059669);"><i class="fas fa-pills"></i> Medication Safety</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-success"><i class="fas fa-check-circle"></i> SAFE to Take</h6>
+                        <ul><li><strong>Paracetamol (Acetaminophen)</strong></li><li>For fever and pain relief</li><li>Follow dosage instructions</li></ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-danger"><i class="fas fa-times-circle"></i> AVOID</h6>
+                        <ul><li><strong>Aspirin</strong> — increases bleeding risk</li><li><strong>Ibuprofen</strong> — increases bleeding risk</li><li>All NSAIDs are dangerous in dengue</li></ul>
+                    </div>
+                </div>
+                <div class="alert alert-danger mb-0"><i class="fas fa-exclamation-triangle"></i> NSAIDs reduce platelet function and increase the risk of hemorrhage in dengue patients.</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const FEATURES = ['high_fever','fever_duration_days','biphasic_fever','muscle_joint_pain','pain_behind_eyes','headache','fatigue','vomiting','skin_rash','bleeding_signs','severe_abdominal_pain','rapid_breathing','extreme_fatigue_restlessness'];
+
+$('#detectionForm').on('submit', function(e) {
+    e.preventDefault();
+    $('#initialMessage').hide(); $('#resultsContainer').hide(); $('#loadingSpinner').show();
+    const data = {model: $('#model_type').val()};
+    FEATURES.forEach(f => { data[f] = parseFloat($('#' + f).val()); });
+    $.ajax({
+        url: '/api/predict/detection', method: 'POST',
+        contentType: 'application/json', data: JSON.stringify(data),
+        success: function(r) { displayResults(r); },
+        error: function(xhr) { alert('Error: ' + (xhr.responseJSON?.error || 'Detection failed')); $('#loadingSpinner').hide(); $('#initialMessage').show(); }
+    });
+});
+
+function displayResults(r) {
+    $('#loadingSpinner').hide(); $('#resultsContainer').show();
+    const colors = {Low:'success', Moderate:'warning', High:'danger'};
+    const icons = {Low:'fa-check-circle', Moderate:'fa-exclamation-circle', High:'fa-exclamation-triangle'};
+    $('#riskBadge').html('<h1><span class="badge bg-'+colors[r.risk_level]+'"><i class="fas '+icons[r.risk_level]+'"></i> '+r.risk_level+' Risk</span></h1>');
+    $('#confidence').text(r.confidence.toFixed(1)+'%');
+    const p = r.probabilities;
+    $('#probLow').text((p.low*100).toFixed(1)+'%'); $('#probLowBar').css('width',(p.low*100)+'%').text((p.low*100).toFixed(1)+'%');
+    $('#probMod').text((p.moderate*100).toFixed(1)+'%'); $('#probModBar').css('width',(p.moderate*100)+'%').text((p.moderate*100).toFixed(1)+'%');
+    $('#probHigh').text((p.high*100).toFixed(1)+'%'); $('#probHighBar').css('width',(p.high*100)+'%').text((p.high*100).toFixed(1)+'%');
+
+    let html = '<div class="alert alert-'+(r.risk_level==='High'?'danger':r.risk_level==='Moderate'?'warning':'success')+'">'+r.explanation.summary+'</div>';
+    const groups = {fever:'🌡️ Fever Indicators', physical:'💪 Physical Symptoms', warning:'⚠️ Warning Signs'};
+    for (const [gk, gl] of Object.entries(groups)) {
+        const items = r.explanation.factors.filter(f => f.group === gk);
+        if (items.length) {
+            html += '<h6 class="mt-3">'+gl+'</h6><div class="list-group mb-2">';
+            items.forEach(f => {
+                const ic = f.status==='warning'?'fa-exclamation-triangle text-danger':'fa-exclamation-circle text-warning';
+                const bc = f.status==='warning'?'bg-danger':'bg-warning text-dark';
+                html += '<div class="list-group-item"><div class="d-flex justify-content-between align-items-center"><strong><i class="fas '+ic+'"></i> '+f.factor+'</strong><span class="badge '+bc+'">'+f.value+'</span></div><small class="text-muted">'+f.reason+'</small></div>';
+            });
+            html += '</div>';
+        }
+    }
+    if (r.explanation.factors.length === 0) html += '<p class="text-muted">No significant symptoms detected.</p>';
+    $('#aiExplanation').html(html);
+    let recs = ''; r.recommendations.forEach(rec => { recs += '<li>'+rec+'</li>'; }); $('#recommendations').html(recs);
+    $('#modelUsed').text(r.model_used);
+}
+</script>
+{% endblock %}

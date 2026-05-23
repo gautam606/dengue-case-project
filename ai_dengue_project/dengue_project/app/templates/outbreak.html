@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+
+{% block title %}Outbreak Prediction - AI Dengue System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-cloud-rain"></i> Environmental Data Input
+            </div>
+            <div class="card-body">
+                <form id="outbreakForm">
+                    <div class="mb-3">
+                        <label for="temperature" class="form-label">
+                            <i class="fas fa-temperature-high"></i> Temperature (°C)
+                        </label>
+                        <input type="number" class="form-control" id="temperature" 
+                               min="20" max="40" step="0.1" value="30" required>
+                        <small class="text-muted">Range: 20-40°C</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="rainfall" class="form-label">
+                            <i class="fas fa-cloud-rain"></i> Rainfall (mm)
+                        </label>
+                        <input type="number" class="form-control" id="rainfall" 
+                               min="0" max="300" step="1" value="150" required>
+                        <small class="text-muted">Range: 0-300mm</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="humidity" class="form-label">
+                            <i class="fas fa-tint"></i> Humidity (%)
+                        </label>
+                        <input type="number" class="form-control" id="humidity" 
+                               min="40" max="100" step="1" value="70" required>
+                        <small class="text-muted">Range: 40-100%</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="population_density" class="form-label">
+                            <i class="fas fa-users"></i> Population Density (per km²)
+                        </label>
+                        <input type="number" class="form-control" id="population_density" 
+                               min="100" max="5000" step="10" value="2000" required>
+                        <small class="text-muted">Range: 100-5000</small>
+                    </div>
+
+
+
+                    <div class="mb-3">
+                        <label for="model_type" class="form-label">
+                            <i class="fas fa-robot"></i> AI Model
+                        </label>
+                        <select class="form-select" id="model_type">
+                            <option value="rf">Random Forest (Recommended)</option>
+                            <option value="lr">Logistic Regression</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-brain"></i> Predict Outbreak Risk
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-chart-bar"></i> AI Prediction Results
+            </div>
+            <div class="card-body">
+                <div id="loadingSpinner" class="text-center" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-3">AI is analyzing environmental data...</p>
+                </div>
+
+                <div id="resultsContainer" style="display: none;">
+                    <!-- Risk Level -->
+                    <div class="text-center mb-4">
+                        <h3>Risk Level</h3>
+                        <div id="riskBadge"></div>
+                        <div class="mt-3">
+                            <h5>Confidence: <span id="confidence"></span></h5>
+                        </div>
+                    </div>
+
+                    <!-- Probabilities -->
+                    <div class="mb-4">
+                        <h5><i class="fas fa-chart-pie"></i> Risk Probabilities</h5>
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between">
+                                <span>Low Risk:</span>
+                                <span id="probLow"></span>
+                            </div>
+                            <div class="progress" style="height: 25px;">
+                                <div id="probLowBar" class="progress-bar bg-success" role="progressbar"></div>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between">
+                                <span>Medium Risk:</span>
+                                <span id="probMedium"></span>
+                            </div>
+                            <div class="progress" style="height: 25px;">
+                                <div id="probMediumBar" class="progress-bar bg-warning" role="progressbar"></div>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between">
+                                <span>High Risk:</span>
+                                <span id="probHigh"></span>
+                            </div>
+                            <div class="progress" style="height: 25px;">
+                                <div id="probHighBar" class="progress-bar bg-danger" role="progressbar"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Explanation -->
+                    <div class="mb-4">
+                        <h5><i class="fas fa-lightbulb"></i> AI Explanation</h5>
+                        <div id="aiExplanation"></div>
+                    </div>
+
+                    <!-- Recommendations -->
+                    <div class="mb-4">
+                        <h5><i class="fas fa-list-check"></i> Recommendations</h5>
+                        <ul id="recommendations"></ul>
+                    </div>
+
+                    <!-- Model Info -->
+                    <div class="alert alert-info">
+                        <strong><i class="fas fa-robot"></i> Model Used:</strong> <span id="modelUsed"></span>
+                    </div>
+                </div>
+
+                <div id="initialMessage" class="text-center text-muted">
+                    <i class="fas fa-info-circle fa-3x mb-3"></i>
+                    <p>Enter environmental data and click "Predict Outbreak Risk" to see AI analysis</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    $('#outbreakForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        // Show loading
+        $('#initialMessage').hide();
+        $('#resultsContainer').hide();
+        $('#loadingSpinner').show();
+        
+        // Prepare data
+        const data = {
+            temperature: parseFloat($('#temperature').val()),
+            rainfall: parseFloat($('#rainfall').val()),
+            humidity: parseFloat($('#humidity').val()),
+            population_density: parseFloat($('#population_density').val()),
+
+            model: $('#model_type').val()
+        };
+        
+        // Make API call
+        $.ajax({
+            url: '/api/predict/outbreak',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function(response) {
+                displayResults(response);
+            },
+            error: function(xhr) {
+                alert('Error: ' + (xhr.responseJSON?.error || 'Prediction failed'));
+                $('#loadingSpinner').hide();
+                $('#initialMessage').show();
+            }
+        });
+    });
+    
+    function displayResults(response) {
+        $('#loadingSpinner').hide();
+        $('#resultsContainer').show();
+        
+        // Risk Level Badge
+        const riskColors = {
+            'Low': 'success',
+            'Medium': 'warning',
+            'High': 'danger'
+        };
+        const badgeClass = riskColors[response.risk_level];
+        $('#riskBadge').html(`<h1><span class="badge bg-${badgeClass}">${response.risk_level} Risk</span></h1>`);
+        
+        // Confidence
+        $('#confidence').text(response.confidence.toFixed(1) + '%');
+        
+        // Probabilities
+        const probs = response.probabilities;
+        $('#probLow').text((probs.low * 100).toFixed(1) + '%');
+        $('#probLowBar').css('width', (probs.low * 100) + '%').text((probs.low * 100).toFixed(1) + '%');
+        
+        $('#probMedium').text((probs.medium * 100).toFixed(1) + '%');
+        $('#probMediumBar').css('width', (probs.medium * 100) + '%').text((probs.medium * 100).toFixed(1) + '%');
+        
+        $('#probHigh').text((probs.high * 100).toFixed(1) + '%');
+        $('#probHighBar').css('width', (probs.high * 100) + '%').text((probs.high * 100).toFixed(1) + '%');
+        
+        // AI Explanation
+        let explanationHTML = '<div class="alert alert-info">' + response.explanation.summary + '</div>';
+        explanationHTML += '<div class="list-group">';
+        response.explanation.factors.forEach(factor => {
+            const iconClass = factor.status === 'risk' ? 'fa-exclamation-triangle text-danger' : 'fa-check-circle text-success';
+            explanationHTML += `
+                <div class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <strong><i class="fas ${iconClass}"></i> ${factor.factor}</strong>
+                        <span class="badge bg-secondary">${factor.value}</span>
+                    </div>
+                    <small class="text-muted">${factor.reason}</small>
+                </div>
+            `;
+        });
+        explanationHTML += '</div>';
+        $('#aiExplanation').html(explanationHTML);
+        
+        // Recommendations
+        let recsHTML = '';
+        response.recommendations.forEach(rec => {
+            recsHTML += `<li>${rec}</li>`;
+        });
+        $('#recommendations').html(recsHTML);
+        
+        // Model Used
+        $('#modelUsed').text(response.model_used);
+    }
+});
+</script>
+{% endblock %}

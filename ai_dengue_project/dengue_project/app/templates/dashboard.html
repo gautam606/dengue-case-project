@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - AI Dengue System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="card"><div class="card-body text-center">
+            <h2><i class="fas fa-chart-line"></i> System Dashboard</h2>
+            <p class="text-muted">Real-time statistics and AI performance metrics</p>
+        </div></div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="col-md-3 mb-4">
+        <div class="card text-center"><div class="card-body">
+            <i class="fas fa-cloud-rain fa-3x mb-3" style="color:#667eea;"></i>
+            <h3>{{ stats.total_environmental_records }}</h3>
+            <p class="text-muted mb-0">Environmental Records</p>
+        </div></div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card text-center"><div class="card-body">
+            <i class="fas fa-stethoscope fa-3x mb-3" style="color:#ef4444;"></i>
+            <h3>{{ stats.total_symptom_records }}</h3>
+            <p class="text-muted mb-0">Symptom Assessments</p>
+        </div></div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card text-center"><div class="card-body">
+            <i class="fas fa-thermometer-half fa-3x mb-3" style="color:#f59e0b;"></i>
+            <h3>{{ stats.total_fever_records }}</h3>
+            <p class="text-muted mb-0">Fever Readings</p>
+        </div></div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card text-center"><div class="card-body">
+            <i class="fas fa-brain fa-3x mb-3" style="color:#10b981;"></i>
+            <h3>{{ stats.total_predictions }}</h3>
+            <p class="text-muted mb-0">AI Predictions Made</p>
+        </div></div>
+    </div>
+
+    <!-- Outbreak Risk Chart -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header"><i class="fas fa-chart-pie"></i> Outbreak Risk Distribution</div>
+            <div class="card-body">
+                <canvas id="outbreakChart"></canvas>
+                <div class="mt-3 text-center">
+                    <span class="badge bg-success me-2">Low: {{ stats.outbreak_predictions.low }}</span>
+                    <span class="badge bg-warning me-2">Medium: {{ stats.outbreak_predictions.medium }}</span>
+                    <span class="badge bg-danger">High: {{ stats.outbreak_predictions.high }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detection Risk Chart -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header"><i class="fas fa-chart-pie"></i> Detection Risk Distribution</div>
+            <div class="card-body">
+                <canvas id="detectionChart"></canvas>
+                <div class="mt-3 text-center">
+                    <span class="badge bg-success me-2">Low: {{ stats.detection_predictions.low }}</span>
+                    <span class="badge bg-warning me-2">Moderate: {{ stats.detection_predictions.moderate }}</span>
+                    <span class="badge bg-danger">High: {{ stats.detection_predictions.high }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header"><i class="fas fa-history"></i> Recent AI Predictions</div>
+            <div class="card-body">
+                {% if stats.recent_activity %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead><tr><th>Type</th><th>Prediction</th><th>Timestamp</th></tr></thead>
+                        <tbody>
+                        {% for activity in stats.recent_activity %}
+                        <tr>
+                            <td>
+                                {% if activity.type == 'outbreak' %}
+                                <span class="badge bg-primary"><i class="fas fa-cloud-rain"></i> Outbreak</span>
+                                {% else %}
+                                <span class="badge bg-danger"><i class="fas fa-stethoscope"></i> Detection</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% set rl = activity.prediction.risk_level|default('N/A') %}
+                                {% if rl == 'High' %}<span class="badge bg-danger">High Risk</span>
+                                {% elif rl == 'Medium' or rl == 'Moderate' %}<span class="badge bg-warning">{{ rl }} Risk</span>
+                                {% else %}<span class="badge bg-success">Low Risk</span>{% endif %}
+                            </td>
+                            <td>{{ activity.timestamp.strftime('%Y-%m-%d %H:%M:%S') if activity.timestamp else 'N/A' }}</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="fas fa-info-circle fa-3x mb-3"></i>
+                    <p>No predictions yet. Start using the system to see activity here.</p>
+                    <a href="/outbreak" class="btn btn-primary me-2">Predict Outbreak</a>
+                    <a href="/detection" class="btn btn-danger">Detect Dengue</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header"><i class="fas fa-robot"></i> AI Models Information</div>
+            <div class="card-body">
+                <h6>Outbreak Prediction:</h6>
+                <ul><li><strong>Logistic Regression:</strong> Baseline</li><li><strong>Random Forest:</strong> Advanced AI ⭐</li></ul>
+                <h6 class="mt-3">Dengue Detection (13 symptoms → 3 risk levels):</h6>
+                <ul><li><strong>Logistic Regression:</strong> Fast baseline</li><li><strong>Random Forest:</strong> Best accuracy ⭐</li><li><strong>SVM:</strong> Pattern recognition</li></ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header"><i class="fas fa-bolt"></i> Quick Actions</div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="/outbreak" class="btn btn-primary"><i class="fas fa-cloud-rain"></i> Outbreak Prediction</a>
+                    <a href="/detection" class="btn btn-danger"><i class="fas fa-stethoscope"></i> Dengue Detection</a>
+                    <a href="/fever-monitor" class="btn btn-warning"><i class="fas fa-thermometer-half"></i> Fever Monitor</a>
+                    <a href="/emergency" class="btn btn-outline-danger" style="border-radius:50px;"><i class="fas fa-exclamation-triangle"></i> Emergency Info</a>
+                    <button class="btn btn-secondary" onclick="location.reload()"><i class="fas fa-sync-alt"></i> Refresh Dashboard</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+new Chart(document.getElementById('outbreakChart').getContext('2d'), {
+    type: 'doughnut',
+    data: { labels: ['Low', 'Medium', 'High'], datasets: [{
+        data: [{{ stats.outbreak_predictions.low }}, {{ stats.outbreak_predictions.medium }}, {{ stats.outbreak_predictions.high }}],
+        backgroundColor: ['#10b981','#f59e0b','#ef4444'], borderWidth: 2, borderColor: '#fff'
+    }]},
+    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+});
+new Chart(document.getElementById('detectionChart').getContext('2d'), {
+    type: 'doughnut',
+    data: { labels: ['Low', 'Moderate', 'High'], datasets: [{
+        data: [{{ stats.detection_predictions.low }}, {{ stats.detection_predictions.moderate }}, {{ stats.detection_predictions.high }}],
+        backgroundColor: ['#10b981','#f59e0b','#ef4444'], borderWidth: 2, borderColor: '#fff'
+    }]},
+    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+});
+</script>
+{% endblock %}

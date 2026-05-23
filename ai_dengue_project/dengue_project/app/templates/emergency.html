@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}Emergency Warning - AI Dengue System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Emergency Alert Banner -->
+    <div class="col-12 mb-4">
+        <div class="card" style="border: 3px solid #ef4444;">
+            <div class="card-header" style="background: linear-gradient(135deg, #dc2626, #991b1b);">
+                <i class="fas fa-exclamation-triangle"></i> Emergency Warning Signs — Dengue
+            </div>
+            <div class="card-body text-center">
+                <h3 class="text-danger"><i class="fas fa-heartbeat"></i> Know the Warning Signs — Act Fast</h3>
+                <p>Severe dengue can be life-threatening. Recognizing warning signs early can save lives.</p>
+                <div class="alert alert-danger"><strong>If you or someone shows ANY of these warning signs, seek immediate medical attention at the nearest hospital.</strong></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Warning Signs Checklist -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header" style="background: linear-gradient(135deg, #dc2626, #991b1b);">
+                <i class="fas fa-list-check"></i> Critical Warning Signs
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    <div class="list-group-item list-group-item-danger"><i class="fas fa-tint text-danger"></i> <strong>Bleeding gums or nose</strong><br><small>Unexplained bleeding from mucosal surfaces</small></div>
+                    <div class="list-group-item list-group-item-danger"><i class="fas fa-tint text-danger"></i> <strong>Blood in vomit or urine</strong><br><small>Hematemesis or hematuria — sign of hemorrhagic dengue</small></div>
+                    <div class="list-group-item list-group-item-danger"><i class="fas fa-stomach text-danger"></i> <strong>Severe abdominal pain</strong><br><small>Persistent, intense pain — possible plasma leakage</small></div>
+                    <div class="list-group-item list-group-item-warning"><i class="fas fa-lungs text-warning"></i> <strong>Rapid or difficult breathing</strong><br><small>Respiratory distress from fluid accumulation</small></div>
+                    <div class="list-group-item list-group-item-warning"><i class="fas fa-tired text-warning"></i> <strong>Extreme fatigue or restlessness</strong><br><small>Altered mental state — sign of shock</small></div>
+                    <div class="list-group-item list-group-item-warning"><i class="fas fa-thermometer-full text-warning"></i> <strong>Persistent vomiting (3+ episodes in 24hrs)</strong><br><small>Dehydration risk and worsening condition</small></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Immediate Actions -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                <i class="fas fa-first-aid"></i> Immediate Actions
+            </div>
+            <div class="card-body">
+                <h5>If Warning Signs Are Present:</h5>
+                <ol class="list-group list-group-numbered">
+                    <li class="list-group-item"><strong>Go to the nearest hospital IMMEDIATELY</strong><br><small>Do not wait — severe dengue progresses rapidly</small></li>
+                    <li class="list-group-item"><strong>Stay hydrated</strong><br><small>Drink ORS, water, coconut water, fruit juices</small></li>
+                    <li class="list-group-item"><strong>Do NOT take Aspirin or Ibuprofen</strong><br><small>These increase bleeding risk — take only Paracetamol</small></li>
+                    <li class="list-group-item"><strong>Rest completely</strong><br><small>Avoid physical activity</small></li>
+                    <li class="list-group-item"><strong>Monitor vital signs</strong><br><small>Temperature, pulse, blood pressure if possible</small></li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <!-- Medication Safety -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header" style="background: linear-gradient(135deg, #10b981, #059669);">
+                <i class="fas fa-pills"></i> Medication Safety in Dengue
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="p-3 rounded" style="background: #d1fae5;">
+                            <h5 class="text-success"><i class="fas fa-check-circle"></i> SAFE</h5>
+                            <h6>Paracetamol</h6>
+                            <p class="mb-0 small">(Acetaminophen)</p>
+                            <ul class="small mt-2"><li>For fever relief</li><li>For pain management</li><li>Follow dosage guidelines</li></ul>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 rounded" style="background: #fee2e2;">
+                            <h5 class="text-danger"><i class="fas fa-times-circle"></i> AVOID</h5>
+                            <h6>Aspirin</h6>
+                            <h6>Ibuprofen</h6>
+                            <p class="mb-0 small">(All NSAIDs)</p>
+                            <ul class="small mt-2"><li>Increases bleeding</li><li>Reduces platelet function</li><li>Risk of hemorrhage</li></ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="alert alert-danger mt-3 mb-0">
+                    <i class="fas fa-exclamation-triangle"></i> <strong>Why avoid NSAIDs?</strong> Dengue causes low platelet counts. NSAIDs (Aspirin, Ibuprofen) further reduce platelet function, dramatically increasing the risk of dangerous internal bleeding.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tourniquet Test -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9);">
+                <i class="fas fa-hand-holding-medical"></i> Tourniquet Test (Educational)
+            </div>
+            <div class="card-body">
+                <h5>What is the Tourniquet Test?</h5>
+                <p>A clinical screening test used to assess capillary fragility in suspected dengue patients.</p>
+                <h6>How it works:</h6>
+                <ol>
+                    <li>A blood pressure cuff is inflated on the upper arm</li>
+                    <li>Maintained at midpoint between systolic and diastolic pressure</li>
+                    <li>Held for 5 minutes</li>
+                    <li>Cuff is released and forearm is examined</li>
+                </ol>
+                <h6>What to look for:</h6>
+                <p><strong>Petechiae</strong> — tiny red or purple dots under the skin, caused by minor bleeding from capillaries.</p>
+                <p><strong>Positive result:</strong> ≥20 petechiae per square inch (2.5 cm²)</p>
+                <div class="alert alert-warning mb-0">
+                    <i class="fas fa-exclamation-triangle"></i> <strong>Important:</strong> A positive tourniquet test is only a clinical indicator. It does NOT definitively diagnose dengue. Laboratory tests (NS1 antigen, IgM/IgG antibodies, CBC) are required for confirmation.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- When to call emergency -->
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header" style="background: linear-gradient(135deg, #dc2626, #7f1d1d);">
+                <i class="fas fa-phone-alt"></i> When to Call Emergency Services
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3 mb-3">
+                        <div class="p-3 rounded" style="background: #fee2e2;">
+                            <i class="fas fa-tint fa-2x text-danger mb-2"></i>
+                            <h6>Uncontrolled Bleeding</h6>
+                            <small>From any site</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="p-3 rounded" style="background: #fee2e2;">
+                            <i class="fas fa-heartbeat fa-2x text-danger mb-2"></i>
+                            <h6>Signs of Shock</h6>
+                            <small>Cold skin, weak pulse, confusion</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="p-3 rounded" style="background: #fee2e2;">
+                            <i class="fas fa-lungs fa-2x text-danger mb-2"></i>
+                            <h6>Severe Breathing Difficulty</h6>
+                            <small>Cannot breathe normally</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="p-3 rounded" style="background: #fee2e2;">
+                            <i class="fas fa-brain fa-2x text-danger mb-2"></i>
+                            <h6>Loss of Consciousness</h6>
+                            <small>Unresponsive or delirious</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-3">
+                    <a href="/detection" class="btn btn-danger btn-lg"><i class="fas fa-stethoscope"></i> Check Your Symptoms with AI</a>
+                    <a href="/fever-monitor" class="btn btn-warning btn-lg ms-2"><i class="fas fa-thermometer-half"></i> Track Your Fever</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

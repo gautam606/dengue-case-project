@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Redirecting - AI Dengue System{% endblock %}
+{% block content %}
+<div class="text-center py-5">
+    <div class="card">
+        <div class="card-body">
+            <i class="fas fa-arrow-right fa-3x mb-3" style="color: #667eea;"></i>
+            <h3>This page has moved!</h3>
+            <p>Patient Diagnosis has been upgraded to <strong>AI-Based Dengue Detection & Monitoring</strong></p>
+            <a href="/detection" class="btn btn-danger btn-lg"><i class="fas fa-stethoscope"></i> Go to Dengue Detection</a>
+        </div>
+    </div>
+</div>
+<script>setTimeout(function(){ window.location.href='/detection'; }, 3000);</script>
+{% endblock %}
